@@ -14,8 +14,8 @@ if __name__ == '__main__':
     db_port = "27017"  # mongodb端口
     is_ssl = False  # 是否配置SSL，默认false
 
-    starttime = datetime.datetime(2021, 5, 19, 5, 20, 0)
-    endtime = datetime.datetime(2021, 5, 19, 6, 22, 0)
+    starttime = datetime.datetime(2021, 5, 27, 1, 42, 0)
+    endtime = datetime.datetime(2021, 5, 27, 2, 43, 0)
 
     task_type_lst5 = ['ExeCliCmdMiniTask']
     task_type_lst10 = ['RunCompareTask', 'RetrieveLiveDataMiniTask', 'ExeCliCmdMiniTask', 'RunMultiNIAnalysisTask',
@@ -52,7 +52,7 @@ if __name__ == '__main__':
         pt_avg_time = 0.000
     print('Path avg execution time is: ' + str(pt_avg_time))
 
-    for task_t in task_type_lst10:
+    for task_t in task_type_lst20:
         work_tasks = tesys.XFTask.find({'taskType': task_t, 'startTime': {'$gt': starttime, '$lt': endtime}})
         task_lst = list(work_tasks)
         count_time = datetime.timedelta(seconds=0)

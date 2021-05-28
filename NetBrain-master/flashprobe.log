@@ -1,0 +1,9 @@
+2021-05-19 13:26:19 [ERROR] Exception: Traceback (most recent call last):
+  File "c:/Users/zchen/Desktop/FPNICLIscript/20210518/NetBrain-master/FlashProbe.py", line 2709, in <module>
+    AlertedPrimaryProbesTriggerOneSecondaryProbe(config)
+  File "c:/Users/zchen/Desktop/FPNICLIscript/20210518/NetBrain-master/FlashProbe.py", line 2672, in AlertedPrimaryProbesTriggerOneSecondaryProbe
+    total_alert = GetDeviceAlertCount(config, device_count)
+  File "c:/Users/zchen/Desktop/FPNICLIscript/20210518/NetBrain-master/FlashProbe.py", line 551, in GetDeviceAlertCount
+    device_alerted_total = config['Device-Alerted Total']
+KeyError: 'Device-Alerted Total'
+

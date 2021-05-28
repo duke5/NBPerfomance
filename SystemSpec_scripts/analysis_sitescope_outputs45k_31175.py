@@ -95,7 +95,7 @@ def server_outputs(oword, mach, mtype, clst):
 if __name__ == '__main__':
 
     filepath = 'E:\\JMeter_data\\SystemSpec0513\\outputs\\45k\\'  # 这里配置output文件存放目录
-    filename = '45k_10user_outputs2'  # 这里配置文件名（不包含后缀）
+    filename = '45k_5user_outputs1'  # 这里配置文件名（不包含后缀）
     opfile = filepath + filename + '.csv'  # 补充后缀
 
     sortfilename = filename + '_sortout'  # 统计后的文件在原名称后加 _sortout
@@ -117,7 +117,7 @@ if __name__ == '__main__':
         fsserverinfo6 = server_outputs('FSServer6', '146fs6', 'win', csvlst)
         fsserverinfo7 = server_outputs('FSServer7', '147fs7', 'win', csvlst)
         fsserverinfo8 = server_outputs('FSServer8', '148fs8', 'win', csvlst)
-        fsserverinfo9 = server_outputs('FSServer9', '149fs9', 'win', csvlst)
+        # fsserverinfo9 = server_outputs('FSServer9', '149fs9', 'win', csvlst)
         linuxservernetinfo = net_data('Linuxnet', '197linux', 'linux', csvlst)
         webservernetinfo = net_data('Webnet', '175web', 'win', csvlst)
         workerservernetinfo1 = net_data('Workernet1', '49worker1', 'win', csvlst)
@@ -131,7 +131,7 @@ if __name__ == '__main__':
         fsservernetinfo6 = net_data('FS6net', '146fs6', 'win', csvlst)
         fsservernetinfo7 = net_data('FS7net', '147fs7', 'win', csvlst)
         fsservernetinfo8 = net_data('FS8net', '148fs8', 'win', csvlst)
-        fsservernetinfo9 = net_data('FS9net', '149fs9', 'win', csvlst)
+        # fsservernetinfo9 = net_data('FS9net', '149fs9', 'win', csvlst)
 
         dbinfo = output_data('Mongodb', 'db', csvlst)
         esinfo = output_data('ES', 'es', csvlst)
@@ -215,17 +215,34 @@ if __name__ == '__main__':
         fs8fspinfo = win_output('FSParser148', '148fs8', 'Process\\FSParser', csvlst)
         fs8fsapiinfo = win_output('FS148', '148fs8', 'Process\\FSApiServer', csvlst)
         fs8postgreinfo = win_output('FSParser148', '148fs8', 'Process\\postgres', csvlst)
-        fs9fsinfo = win_output('FS149', '149fs9', 'Process\\FrontServer', csvlst)
-        fs9fspinfo = win_output('FSParser149', '149fs9', 'Process\\FSParser', csvlst)
-        fs9fsapiinfo = win_output('FS149', '149fs9', 'Process\\FSApiServer', csvlst)
-        fs9postgreinfo = win_output('FSParser149', '149fs9', 'Process\\postgres', csvlst)
+        # fs9fsinfo = win_output('FS149', '149fs9', 'Process\\FrontServer', csvlst)
+        # fs9fspinfo = win_output('FSParser149', '149fs9', 'Process\\FSParser', csvlst)
+        # fs9fsapiinfo = win_output('FS149', '149fs9', 'Process\\FSApiServer', csvlst)
+        # fs9postgreinfo = win_output('FSParser149', '149fs9', 'Process\\postgres', csvlst)
 
+    # server_lsts = [dbserverinfo, webserverinfo, workerserverinfo1, workerserverinfo2, workerserverinfo3, fsserverinfo1,
+    #                fsserverinfo2, fsserverinfo3, fsserverinfo4, fsserverinfo5, fsserverinfo6, fsserverinfo7,
+    #                fsserverinfo8, fsserverinfo9]
     server_lsts = [dbserverinfo, webserverinfo, workerserverinfo1, workerserverinfo2, workerserverinfo3, fsserverinfo1,
                    fsserverinfo2, fsserverinfo3, fsserverinfo4, fsserverinfo5, fsserverinfo6, fsserverinfo7,
-                   fsserverinfo8, fsserverinfo9]
-    server_net_lsts = [linuxservernetinfo, workerservernetinfo1, workerservernetinfo2, workerservernetinfo3,
-                       fsservernetinfo1, fsservernetinfo2, fsservernetinfo3, fsservernetinfo4, fsservernetinfo5,
-                       fsservernetinfo6, fsservernetinfo7, fsservernetinfo8, fsservernetinfo9]
+                   fsserverinfo8]
+    # server_net_lsts = [linuxservernetinfo, webservernetinfo, workerservernetinfo1, workerservernetinfo2,
+    #                    workerservernetinfo3, fsservernetinfo1, fsservernetinfo2, fsservernetinfo3, fsservernetinfo4,
+    #                    fsservernetinfo5, fsservernetinfo6, fsservernetinfo7, fsservernetinfo8, fsservernetinfo9]
+    server_net_lsts = [linuxservernetinfo, webservernetinfo, workerservernetinfo1, workerservernetinfo2,
+                       workerservernetinfo3, fsservernetinfo1, fsservernetinfo2, fsservernetinfo3, fsservernetinfo4,
+                       fsservernetinfo5, fsservernetinfo6, fsservernetinfo7, fsservernetinfo8]
+    # service_lsts = [dbinfo, esinfo, mqinfo, redisinfo, iis1info, teinfo, fscinfo, wo1rminfo, wo1ws1info, wo1ws2info,
+    #                 wo1ws3info, wo1ws4info, wo1ws5info, wo1ws6info, wo1ws7info, wo1ws8info, wo1ec1info, wo1ec2info,
+    #                 wo1ec3info, wo1ec4info, wo2rminfo, wo2ws1info, wo2ws2info, wo2ws3info, wo2ws4info, wo2ws5info,
+    #                 wo2ws6info, wo2ws7info, wo2ws8info, wo2ec1info, wo2ec2info, wo2ec3info, wo2ec4info, wo3rminfo,
+    #                 wo3ws1info, wo3ws2info, wo3ws3info, wo3ws4info, wo3ws5info, wo3ws6info, wo3ws7info, wo3ws8info,
+    #                 wo3ec1info, wo3ec2info, wo3ec3info, wo3ec4info, fs1fsinfo, fs1fspinfo, fs1fsapiinfo, fs1postgreinfo,
+    #                 fs2fsinfo, fs2fspinfo, fs2fsapiinfo, fs2postgreinfo, fs3fsinfo, fs3fspinfo, fs3fsapiinfo,
+    #                 fs3postgreinfo, fs4fsinfo, fs4fspinfo, fs4fsapiinfo, fs4postgreinfo, fs5fsinfo, fs5fspinfo,
+    #                 fs5fsapiinfo, fs5postgreinfo, fs6fsinfo, fs6fspinfo, fs6fsapiinfo, fs6postgreinfo, fs7fsinfo,
+    #                 fs7fspinfo, fs7fsapiinfo, fs7postgreinfo, fs8fsinfo, fs8fspinfo, fs8fsapiinfo, fs8postgreinfo,
+    #                 fs9fsinfo, fs9fspinfo, fs9fsapiinfo, fs9postgreinfo]
     service_lsts = [dbinfo, esinfo, mqinfo, redisinfo, iis1info, teinfo, fscinfo, wo1rminfo, wo1ws1info, wo1ws2info,
                     wo1ws3info, wo1ws4info, wo1ws5info, wo1ws6info, wo1ws7info, wo1ws8info, wo1ec1info, wo1ec2info,
                     wo1ec3info, wo1ec4info, wo2rminfo, wo2ws1info, wo2ws2info, wo2ws3info, wo2ws4info, wo2ws5info,
@@ -235,8 +252,7 @@ if __name__ == '__main__':
                     fs2fsinfo, fs2fspinfo, fs2fsapiinfo, fs2postgreinfo, fs3fsinfo, fs3fspinfo, fs3fsapiinfo,
                     fs3postgreinfo, fs4fsinfo, fs4fspinfo, fs4fsapiinfo, fs4postgreinfo, fs5fsinfo, fs5fspinfo,
                     fs5fsapiinfo, fs5postgreinfo, fs6fsinfo, fs6fspinfo, fs6fsapiinfo, fs6postgreinfo, fs7fsinfo,
-                    fs7fspinfo, fs7fsapiinfo, fs7postgreinfo, fs8fsinfo, fs8fspinfo, fs8fsapiinfo, fs8postgreinfo,
-                    fs9fsinfo, fs9fspinfo, fs9fsapiinfo, fs9postgreinfo]
+                    fs7fspinfo, fs7fsapiinfo, fs7postgreinfo, fs8fsinfo, fs8fspinfo, fs8fsapiinfo, fs8postgreinfo]
 
     with open(sortopfile, 'a', newline='') as data:
         live_file = csv.writer(data)

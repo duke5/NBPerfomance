@@ -36,11 +36,13 @@ def parse_cvs(dev_c, user_c, clst):
 
 
 if __name__ == '__main__':
-    filepath = 'C:\\Systemspec_folder\\TestOutputs\\'  # 这里配置output文件存放目录
+    filepath = 'E:\\JMeter_data\\SystemSpec0513\\outputs\\45k\\'  # 这里配置output文件存放目录
+    # filepath = 'C:\\Systemspec_folder\\TestOutputs\\'  # 这里配置output文件存放目录
     filename_end = 'user_outputs_sortout.csv'  # 这里配置文件名（不包含后缀）
     outfile = filepath + 'final_sum.csv'
     user_lst = ['5', '10', '20', '30', '40', '50']
-    devscop_lst = ['1k', '3k', '5k', '8k', '10k']
+    # devscop_lst = ['1k', '3k', '5k', '8k', '10k']
+    devscop_lst = ['45k']
     op_lst = []
     for tm1 in devscop_lst:
         for tm2 in user_lst:
