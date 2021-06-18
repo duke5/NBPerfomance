@@ -1,7 +1,7 @@
 import csv
 
 
-def parse_cvs(dev_c, user_c, clst):
+def parse_cvs(dev_c, clst):
     outs = {}
     for data_row in clst:
         if data_row[0] == 'WinServer':
@@ -22,7 +22,7 @@ def parse_cvs(dev_c, user_c, clst):
             outs['fs2_net'] = data_row
     if outs['win_cmd'] and outs['lin_cmd'] and outs['fs_cmd'] and outs['win_net'] and outs['lin_net'] and outs[
         'fs_net']:
-        lst_out = [dev_c, user_c]
+        lst_out = [dev_c]
         lst_out.extend(outs['lin_cmd'][1:])
         lst_out.extend(outs['lin_net'][1:])
         lst_out.extend(outs['win_cmd'][1:])
@@ -36,21 +36,20 @@ def parse_cvs(dev_c, user_c, clst):
 
 
 if __name__ == '__main__':
-    filepath = 'E:\\JMeter_data\\SystemSpec0513\\outputs\\45k\\'  # 这里配置output文件存放目录
-    # filepath = 'C:\\Systemspec_folder\\TestOutputs\\'  # 这里配置output文件存放目录
-    filename_end = 'user_outputs_sortout.csv'  # 这里配置文件名（不包含后缀）
-    outfile = filepath + 'final_sum.csv'
-    user_lst = ['5', '10', '20', '30', '40', '50']
-    # devscop_lst = ['1k', '3k', '5k', '8k', '10k']
-    devscop_lst = ['45k']
+    # filepath = 'E:\\JMeter_data\\SystemSpec0513\\outputs\\45k\\'  # 这里配置output文件存放目录
+    filepath = 'C:\\Systemspec_folder\\10k_backends\\'  # 这里配置output文件存放目录
+    filename_parts = '_backend_outputs'  # 这里配置文件名（不包含后缀）
+    outfile = filepath + 'backends_sum.csv'
+    # user_lst = ['5', '10', '20', '30', '40', '50']
+    devscop_lst = ['3k', '5k', '10k']
     op_lst = []
     for tm1 in devscop_lst:
-        for tm2 in user_lst:
-            opfile = filepath + tm1 + '_outputs\\' + tm1 + '_' + tm2 + filename_end
+        for tm2 in range(1, 4):
+            opfile = filepath + tm1 + filename_parts + str(tm2) + '_sortout.csv'
             with open(opfile, encoding='utf-8') as f:
                 reader = csv.reader(f)
                 csvlst = list(reader)
-                sub_lst = parse_cvs(tm1, tm2, csvlst)
+                sub_lst = parse_cvs(tm1, csvlst)
                 # print(sub_lst)
                 op_lst.append(sub_lst)
 
@@ -60,7 +59,7 @@ if __name__ == '__main__':
     with open(outfile, 'a', newline='') as data:
         live_file = csv.writer(data)
         live_file.writerow(
-            ['Device Scope', 'Users', 'CPU of linux server', 'Memory of Linux server', 'Disk IO read of Linux server',
+            ['Device Scope', 'CPU of linux server', 'Memory of Linux server', 'Disk IO read of Linux server',
              'Disk IO write of Linux server', 'Network receive of Linux server',
              'Network send of Linux server', 'CPU of Windows server', 'Memory of Windows server',
              'Disk IO read of Windows server', 'Disk IO write of Windows server',

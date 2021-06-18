@@ -14,8 +14,8 @@ if __name__ == '__main__':
     db_port = "27017"  # mongodb端口
     is_ssl = False  # 是否配置SSL，默认false
 
-    starttime = datetime.datetime(2021, 5, 27, 1, 42, 0)
-    endtime = datetime.datetime(2021, 5, 27, 2, 43, 0)
+    starttime = datetime.datetime(2021, 6, 9, 6, 42, 0)
+    endtime = datetime.datetime(2021, 6, 9, 7, 44, 0)
 
     task_type_lst5 = ['ExeCliCmdMiniTask']
     task_type_lst10 = ['RunCompareTask', 'RetrieveLiveDataMiniTask', 'ExeCliCmdMiniTask', 'RunMultiNIAnalysisTask',

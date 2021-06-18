@@ -94,8 +94,8 @@ def server_outputs(oword, mach, mtype, clst):
 
 if __name__ == '__main__':
 
-    filepath = 'C:\\Systemspec_folder\\TestOutputs\\10k_outputs\\'  # 这里配置output文件存放目录
-    filename = '10k_50user_outputs'  # 这里配置文件名（不包含后缀）
+    filepath = 'C:\\Systemspec_folder\\10k_backends\\'  # 这里配置output文件存放目录
+    filename = '8k_backend_outputs3'  # 这里配置文件名（不包含后缀）
     opfile = filepath + filename + '.csv'  # 补充后缀
 
     sortfilename = filename + '_sortout'  # 统计后的文件在原名称后加 _sortout

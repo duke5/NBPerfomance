@@ -24,7 +24,7 @@ from NetBrainIE import NetBrainIE
 from NetBrainDB import NetBrainDB, PostgresDB
 from Utils.NetBrainUtils import NetBrainUtils, CurrentMethodName, CreateGuid
 
-ConfigFile = r'.\conf\FlashProbe31114.conf'
+ConfigFile = r'.\conf\FlashProbe5250.conf'
 #ConfigFile = r'.\conf\FlashProbe99188.conf'
 #ConfigFile = r'.\conf\FlashProbe3197.conf'
 #ConfigFile = r'.\conf\FlashProbe31110.conf'

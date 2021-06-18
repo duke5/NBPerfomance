@@ -24,3 +24,5 @@ if __name__ == '__main__':
     for i in lst2:
         if len(i) != 0:
             print(i[0])
+
+    lsts = ['abc', ['1', '2']]

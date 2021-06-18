@@ -13,10 +13,12 @@ from NetBrainIE import NetBrainIE, PrintMessage
 from NetBrainDB import NetBrainDB
 from Utils.NetBrainUtils import NetBrainUtils, CurrentMethodName, CreateGuid
 
-ConfigFile = r'.\conf\FID31114.conf'
-#ConfigFile = r'.\conf\FID31200.conf'
-#ConfigFile = r'.\conf\FID31110.conf'
-#ConfigFile = r'.\conf\FID30198.conf'
+ConfigFile = r'.\conf\FID5250.conf'
+
+
+# ConfigFile = r'.\conf\FID31200.conf'
+# ConfigFile = r'.\conf\FID31110.conf'
+# ConfigFile = r'.\conf\FID30198.conf'
 
 
 def FID(application=None, configFile=''):
@@ -62,10 +64,12 @@ def FID(application=None, configFile=''):
             app.Logout()
         return ret
 
+
 def AddFIDFolder(application=None, configFile=''):
     test_data = configFile['New Folder']
     application.fid_add_tree_folder_by_name(test_data['Folder Name'], test_data['Parent Name'])
     return True
+
 
 def ImportFID(application=None, configFile=''):
     test_data = configFile['Import FID']
@@ -86,6 +90,7 @@ def ImportFID(application=None, configFile=''):
     #         PrintMessage(f'{fullname} is exist, skipped.', 'Warning')
     return True
 
+
 def ExecuteFID(application=None, configFile=''):
     fids = configFile['Execute FIDs']
     db = NetBrainDB(configFile['DB Info'])
@@ -99,7 +104,7 @@ def ExecuteFID(application=None, configFile=''):
             continue
         device_ids = value.get('Device IPs', [])
         if len(device_ids) > 0:
-            devices = db.GetAll('Device', {'mgmtIP':{'$in': device_ids}})
+            devices = db.GetAll('Device', {'mgmtIP': {'$in': device_ids}})
         else:
             devices = db.GetAll('Device', {})
         device_ids = [item['_id'] for item in devices]
@@ -117,13 +122,15 @@ def ExecuteFID(application=None, configFile=''):
     db.Logout()
     return True
 
-def GetQualification(sub_types:list):
+
+def GetQualification(sub_types: list):
     qualification = ''
     for item in sub_types:
         qualification += f'$device.subTypeName == "{item}" || '
     return ' ' if len(qualification) < 4 else qualification[:-4]
 
-def GetRuleConditions(rule_conditions:list, prefix_space:str):
+
+def GetRuleConditions(rule_conditions: list, prefix_space: str):
     conditions = prefix_space + 'conditions:\n'
     for item in rule_conditions:
         conditions += ''.join([prefix_space, '  - operand1: ', item['operand1'], '\n'])
@@ -132,10 +139,12 @@ def GetRuleConditions(rule_conditions:list, prefix_space:str):
     conditions += prefix_space + 'boolean_expression: A\n'
     return conditions
 
+
 def GenerateFIDTemplate(app, config):
     fid_config = config.get('FlashProbe Template', None)
     if fid_config is None:
-        PrintMessage(''.join([CurrentMethodName(), 'Failed to load the FlashProbe info in configuration file.']), 'Warning')
+        PrintMessage(''.join([CurrentMethodName(), 'Failed to load the FlashProbe info in configuration file.']),
+                     'Warning')
         return False
     contents = ""
     for key, item in fid_config.items():
@@ -170,7 +179,8 @@ def GenerateFIDTemplate(app, config):
                 if content is not None:
                     contents += f'            monitor:  # fill in this flag to indicate that this variable needs to be monitored\n'
                     contents += f'              display_name: {var["Name"]}  # display name which show up on the map data view.\n'
-                    contents += '              unit: "' + {content['Unit']} + '"  # unit which show up on the map data view.\n'
+                    contents += '              unit: "' + {
+                        content['Unit']} + '"  # unit which show up on the map data view.\n'
             contents += '    rule:  # valid for type=Primary|Secondary&&trigger_type=AlertBased\n'
             content = 'true' if fp['Variable']['Rule']['Loop Table Rows'] else 'false'
             contents += f'      loop_table_rows: {content}\n'
@@ -181,6 +191,7 @@ def GenerateFIDTemplate(app, config):
             contents += f'    enable: {content}  # whether to enable, true is default value\n'
     return contents
 
+
 def GetDevicesWithFlashAlert(config):
     db = NetBrainDB(config['DB Info'])
     db.Login()
@@ -189,6 +200,7 @@ def GetDevicesWithFlashAlert(config):
     db.Logout()
     device_count = int(len(devices) * 1.11 * config['Device Group With Flash Alert']['Alert Percentage'] + 0.5)
     return devices[:device_count]
+
 
 def DefineDeviceGroupWithAlert(app: NetBrainIE, config, devices=None):
     group_info = config.get('Device Group With Flash Alert', None)
@@ -214,7 +226,8 @@ def DefineDeviceGroupWithAlert(app: NetBrainIE, config, devices=None):
             return False
     return True
 
-def ModifyProbeAndApply(app, config, devices:list, probe_name='show_access_lists01'):
+
+def ModifyProbeAndApply(app, config, devices: list, probe_name='show_access_lists01'):
     device = devices[0]
     flash_probes = app.flashprobes_search(device['_id'])
     source_probe = next((item for item in flash_probes['flashProbes'] if item.get('name', None) == probe_name), None)
