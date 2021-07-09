@@ -108,36 +108,36 @@ def time_to_str(timelocal):  # Topo Table name时间处理
     return time_trans
 
 
-def topotablename_aim(tptype, tt_source, mins):  # Topo Table name时间范围处理
+def topotablename_aim(tptype, tt_source):  # Topo Table name时间范围处理
     tutc = tt_source.get('time')
     th = datetime.timedelta(hours=8)
-    topo_table_name_list = []
-    for time_mem in range(mins):
-        table_time = time_to_str(tutc + th - datetime.timedelta(minutes=time_mem))
-        topo_table_name_list.append(tptype + '_' + table_time)
-    print('>>>Will find TopoTable name in list: ' + str(topo_table_name_list))
-    return topo_table_name_list
+    table_time = time_to_str(tutc + th)[:-1]
+    topo_table_reg = tptype + '_' + table_time
+    # topo_table_doc = db.TopologyTableManageTable.find_one({'name': {'$regex': topo_table_reg}})
+    # topo_table_name = topo_table_doc.get('name')
+    # print('>>>TopoTable reg is: ' + str(topo_table_reg))
+    return topo_table_reg
 
 
-def topo_name_specify(act_id, topo_type, less_time):  # 拼接可能的topo table name
+def topo_name_specify(act_id, topo_type):  # 拼接可能的topo table name
     if topo_type == "L3_Topo_Type":
         topo_table_source1 = db.BenchmarkSummaryLog.find_one(
             {'dataSourceId': act_id, 'msg': {'$regex': 'Begin: build IPv4 L3 topology'}})
         topo_table_source2 = db.BenchmarkSummaryLog.find_one(
             {'dataSourceId': act_id, 'msg': 'Try to build topology IPv4 L3 Topology'})
         if topo_table_source1:
-            topo_table = topotablename_aim(topo_type, topo_table_source1, less_time)
+            topo_table = topotablename_aim(topo_type, topo_table_source1)
             return topo_table
         elif topo_table_source2:
-            topo_table = topotablename_aim(topo_type, topo_table_source2, less_time)
+            topo_table = topotablename_aim(topo_type, topo_table_source2)
             return topo_table
         else:
-            return []
+            return None
     elif topo_type == "L2_Topo_Type":
         topo_table_source = db.BenchmarkSummaryLog.find_one(
             {'dataSourceId': act_id, 'msg': 'Try to build topology L2 Topology'})
         if topo_table_source:
-            topo_table = topotablename_aim(topo_type, topo_table_source, less_time)
+            topo_table = topotablename_aim(topo_type, topo_table_source)
             return topo_table
         else:
             return []
@@ -145,28 +145,28 @@ def topo_name_specify(act_id, topo_type, less_time):  # 拼接可能的topo tabl
         topo_table_source = db.BenchmarkSummaryLog.find_one(
             {'dataSourceId': act_id, 'msg': 'Try to build topology IPv6 L3 Topology'})
         if topo_table_source:
-            topo_table = topotablename_aim(topo_type, topo_table_source, less_time)
+            topo_table = topotablename_aim(topo_type, topo_table_source)
             return topo_table
         else:
-            return []
+            return None
     elif topo_type == "VPN_Topo_Type":
         topo_table_source = db.BenchmarkSummaryLog.find_one(
             {'dataSourceId': act_id, 'msg': 'Try to build topology IPsec VPN Topology'})
         if topo_table_source:
-            topo_table = topotablename_aim(topo_type, topo_table_source, less_time)
+            topo_table = topotablename_aim(topo_type, topo_table_source)
             return topo_table
         else:
-            return []
+            return None
     elif topo_type == "Logical_Topo_Type":
         topo_table_source = db.BenchmarkSummaryLog.find_one(
             {'dataSourceId': act_id, 'msg': 'Try to build topology Logical Topology'})
         if topo_table_source:
-            topo_table = topotablename_aim(topo_type, topo_table_source, less_time)
+            topo_table = topotablename_aim(topo_type, topo_table_source)
             return topo_table
         else:
-            return []
+            return None
     else:
-        return []
+        return None
 
 
 def get_log_info(msg, log_index):
@@ -224,38 +224,39 @@ def topo_log_count(act_id, topo_type):
         return 'Wrong Type'
 
 
-def dis_topo_link_count(act_id, topo_type, tp_min):  # 统计不同类型topo link count，size
-    ttp = topo_name_specify(act_id, topo_type, tp_min)
+def dis_topo_link_count(act_id, topo_type):  # 统计不同类型topo link count，size
+    ttp = topo_name_specify(act_id, topo_type)
     if ttp:
-        for topo_filter_num in range(tp_min):
-            topo_filter = db.TopologyTableManageTable.find_one({"name": {"$regex": ttp[topo_filter_num]}})
-            if topo_filter:
-                topo_table_name = topo_filter.get('name')
-                table_status = db.command("collstats", topo_table_name)
-                # print(topo_table_name)
-                topo_count = table_status.get('count')
-                # topo_count = topo_log_count(act_id, topo_type)
-                topo_size = round((table_status.get('size') / 1048576), 3)
-                return str(topo_count), str(topo_size) + 'M'
+        # for topo_filter_num in range(tp_min):
+        topo_filter = db.TopologyTableManageTable.find_one({"name": {"$regex": ttp}})
+        if topo_filter:
+            topo_table_name = topo_filter.get('name')
+            table_status = db.command("collstats", topo_table_name)
+            # print(topo_table_name)
+            topo_count = table_status.get('count')
+            # topo_count = topo_log_count(act_id, topo_type)
+            topo_size = round((table_status.get('size') / 1048576), 3)
+            return str(topo_count), str(topo_size) + 'M'
         else:
             return "Not Found", "Not Found"
     else:
         return "No Topo", "No Topo"
 
 
-def topo_link_count(act_id, topo_type, tp_min):  # 统计不同类型topo link count，size
-    ttp = topo_name_specify(act_id, topo_type, tp_min)
+def topo_link_count(act_id, topo_type):  # 统计不同类型topo link count，size
+    ttp = topo_name_specify(act_id, topo_type)
     if ttp:
-        for topo_filter_num in range(tp_min):
-            topo_filter = db.TopologyTableManageTable.find_one({"name": {"$regex": ttp[topo_filter_num]}})
-            if topo_filter:
-                topo_table_name = topo_filter.get('name')
-                table_status = db.command("collstats", topo_table_name)
-                # print(topo_table_name)
-                # topo_count = table_status.get('count')
-                topo_count = topo_log_count(act_id, topo_type)
-                topo_size = round((table_status.get('size') / 1048576), 3)
-                return str(topo_count), str(topo_size) + 'M'
+        # for topo_filter_num in range(tp_min):
+        topo_filter = db.TopologyTableManageTable.find_one({"name": {"$regex": ttp}})
+        if topo_filter:
+            topo_table_name = topo_filter.get('name')
+            print(topo_type + ' Name is: ' + topo_table_name)
+            table_status = db.command("collstats", topo_table_name)
+            # print(topo_table_name)
+            # topo_count = table_status.get('count')
+            topo_count = topo_log_count(act_id, topo_type)
+            topo_size = round((table_status.get('size') / 1048576), 3)
+            return str(topo_count), str(topo_size) + 'M'
         else:
             return "Not Found", "Not Found"
     else:
@@ -289,7 +290,11 @@ def judge_sepdb(sep_domain_name):
 
 
 def discover_data(dis_id, sep_flag):  # Discovery数据统计
-    dis_csv = domain_name + '_Dis_live_' + dis_id + '.csv'
+    if os.path.exists(os.getcwd() + '\\OutputFiles'):
+        dis_csv = os.getcwd() + '\\OutputFiles\\' + domain_name + '_Dis_live_' + dis_id + '.csv'
+    else:
+        os.makedirs(os.getcwd() + '\\OutputFiles')
+        dis_csv = os.getcwd() + '\\OutputFiles\\' + domain_name + '_Dis_live_' + dis_id + '.csv'
     node_count = str(db.Device.count_documents({}))
     device_count = dis_devices(dis_id)
     dis_time = full_time(dis_id)[0: -7]
@@ -299,10 +304,10 @@ def discover_data(dis_id, sep_flag):  # Discovery数据统计
     config_count = config_coll(dis_id, sep_flag)
     IPv4L3_time = time_cost(dis_id, {'$regex': 'Begin: build IPv4 L3 topology'},
                             {'$regex': 'End: build IPv4 L3 topology'})
-    IPv4L3_topo_info = dis_topo_link_count(dis_id, 'L3_Topo_Type', topo_min)
+    IPv4L3_topo_info = dis_topo_link_count(dis_id, 'L3_Topo_Type')
     cdp_count = item_count(dis_id, 'cdpTable', sep_flag)
     route_count = item_count(dis_id, 'routeTable', sep_flag)
-    bgp_mpls_time = time_cost(dis_id, 'Begin: update BGP MPLS cloud CE list.', 'End:   update BGP MPLS cloud CE list.')
+    # bgp_mpls_time = time_cost(dis_id, 'Begin: update BGP MPLS cloud CE list.', 'End:   update BGP MPLS cloud CE list.')
     sync_site_time = time_cost(dis_id, 'Begin: rebuild all sites.', 'End: rebuild all sites.')
     build_visual_space_logical_time = time_cost(dis_id, 'Begin: build visual space logical nodes.',
                                                 'End: build visual space logical nodes.')
@@ -319,7 +324,7 @@ def discover_data(dis_id, sep_flag):  # Discovery数据统计
     print('---IPv4 L3 Topo Link count: ' + IPv4L3_topo_info[0] + ' | Size: ' + IPv4L3_topo_info[1])
     print('---CDP Table count: ' + cdp_count[0] + ' | Size: ' + cdp_count[1])
     print('---Routing Table count: ' + route_count[0] + ' | Size: ' + route_count[1])
-    print('---Update BGP MPLS cloud CE list time: ' + bgp_mpls_time)
+    # print('---Update BGP MPLS cloud CE list time: ' + bgp_mpls_time)
     print('---Synchronize device to site time: ' + sync_site_time)
     print('---Build visual space logical nodes time: ' + build_visual_space_logical_time)
     print('---Build network tree time: ' + build_network_tree)
@@ -332,15 +337,15 @@ def discover_data(dis_id, sep_flag):  # Discovery数据统计
                                 'Discover live time', 'DataEntries Count', 'Full Datafolder size', 'Config count',
                                 'Config size', 'IPv4 L3 Topo time', 'IPv4 L3 Topo Link count', 'IPv4 L3 Topo Link size',
                                 'CDP Table count', 'CDP Table size', 'Routing Table count',
-                                'Routing Table size', 'Update BGP MPLS cloud CE list time',
+                                'Routing Table size',
                                 'Synchronize device to site time', 'Build visual space logical nodes time',
                                 'Build network tree time'])
             live_file.writerow([node_count, device_count[0], device_count[1], dis_time, dis_live, entries_ct, data_size,
                                 config_count[0], config_count[1], IPv4L3_time, IPv4L3_topo_info[0], IPv4L3_topo_info[1],
-                                cdp_count[0], cdp_count[1], route_count[0], route_count[1], bgp_mpls_time,
+                                cdp_count[0], cdp_count[1], route_count[0], route_count[1],
                                 sync_site_time, build_visual_space_logical_time, build_network_tree])
         print('Generate Discovery CSV File done.')
-        print('CSV File path:' + os.getcwd() + '\\' + dis_csv)
+        print('CSV File path:' + dis_csv)
     else:
         print('Will not Generate CSV file.')
 
@@ -355,33 +360,32 @@ def benchmark_data(ben_id, sep_flag, ben_name):  # Benchmark数据统计
     config_count = config_coll(ben_id, sep_flag)
     IPv4Topo_time = time_cost(ben_id, 'Try to build topology IPv4 L3 Topology',
                               {'$regex': 'End: build IPv4 L3 Topology'})
-    IPv4_topo_info = topo_link_count(ben_id, 'L3_Topo_Type', topo_min)
+    IPv4_topo_info = topo_link_count(ben_id, 'L3_Topo_Type')
     L2Topo_time = time_cost(ben_id, 'Try to build topology L2 Topology', {'$regex': 'End: build L2 Topology'})
-    L2Topo_info = topo_link_count(ben_id, 'L2_Topo_Type', topo_min)
+    L2Topo_info = topo_link_count(ben_id, 'L2_Topo_Type')
     IPv6L3_time = time_cost(ben_id, 'Try to build topology IPv6 L3 Topology', {'$regex': 'End: build IPv6 L3 Topology'})
-    IPv6L3_topo_info = topo_link_count(ben_id, 'Ipv6_L3_Topo_Type', topo_min)
+    IPv6L3_topo_info = topo_link_count(ben_id, 'Ipv6_L3_Topo_Type')
     ipsec_vpn_topo_time = time_cost(ben_id, 'Try to build topology L3 VPN Tunnel',
                                     {'$regex': 'End: build L3 VPN Tunnel'})
-    vpn_topo_info = topo_link_count(ben_id, 'VPN_Topo_Type', topo_min)
+    vpn_topo_info = topo_link_count(ben_id, 'VPN_Topo_Type')
     topo_logical_time = time_cost(ben_id, 'Try to build topology Logical Topology',
                                   {'$regex': 'End: build Logical Topology'})
-    topo_logical_info = topo_link_count(ben_id, 'Logical_Topo_Type', topo_min)
+    topo_logical_info = topo_link_count(ben_id, 'Logical_Topo_Type')
     data_view_count = str(db.DefaultDeviceDataView.count_documents({}))
     devgp_count = str(db.DeviceGroup.count_documents({}))
     update_endpoint_time = time_cost(ben_id, 'Begin: update Global Endpoint index.',
                                      {'$regex': 'End: update Global Endpoint index.'})
-    bgp_mpls_time = time_cost(ben_id, 'Begin: update BGP MPLS cloud CE list.',
-                              {'$regex': 'End: update BGP MPLS cloud CE list.'})
+    # bgp_mpls_time = time_cost(ben_id, 'Begin: update BGP MPLS cloud CE list.',
+    #                           {'$regex': 'End: update BGP MPLS cloud CE list.'})
     recal_dyna_devicegp = time_cost(ben_id, 'Begin: recalculate dynamic device group.',
                                     {'$regex': 'End: recalculate dynamic device group.'})
     recal_site_time = time_cost(ben_id, 'Begin: recalculate site.', {'$regex': 'End: recalculate site.'})
-    recal_mpls_cloud = mpls_cloud_time(ben_id)
+    # recal_mpls_cloud = mpls_cloud_time(ben_id)
     default_dataview = time_cost(ben_id, 'Begin: build default device data view.',
                                  {'$regex': 'End: build default device data view.'})
     pre_qualify_dvt_time = time_cost(ben_id,
-                                     'Begin: Pre-qualify data view templates against all devices and logic nodes.',
-                                     {
-                                         '$regex': 'End: Pre-qualify data view templates against all devices and logic nodes.'})
+                                     'Begin: Pre-qualify Automation Assets against all devices and logic nodes.',
+                                     'End: Pre-qualify Automation Assets against all devices and logic nodes. ')
     visual_space_time = time_cost(ben_id, 'Begin: build visual space instance.',
                                   {'$regex': 'End: build visual space instance.'})
     network_tree_time = time_cost(ben_id, 'Begin: build network tree.', {'$regex': 'End: build network tree.'})
@@ -421,10 +425,10 @@ def benchmark_data(ben_id, sep_flag, ben_name):  # Benchmark数据统计
     print('---topology Logical Topology count: ' + topo_logical_info[0] + ' | Size: ' + topo_logical_info[1])
     print('---Device Group count: ' + devgp_count)
     print('---Update Global Endpoint index time: ' + update_endpoint_time)
-    print('---Update BGP MPLS cloud CE list time: ' + bgp_mpls_time)
+    # print('---Update BGP MPLS cloud CE list time: ' + bgp_mpls_time)
     print('---Recalculate dynamic device group time: ' + recal_dyna_devicegp)
     print('---Recalculate site time: ' + recal_site_time)
-    print('---Recalculate MPLS Could time: ' + recal_mpls_cloud)
+    # print('---Recalculate MPLS Could time: ' + recal_mpls_cloud)
     print('---Build Default Dataview Time: ' + default_dataview + ' | Count: ' + data_view_count)
     print('---Pre qualify DVT time: ' + pre_qualify_dvt_time)
     print('---Build visual space instance time: ' + visual_space_time)
@@ -446,9 +450,17 @@ def benchmark_data(ben_id, sep_flag, ben_name):  # Benchmark数据统计
     print('---IPsec VPN Table[Real-time] count: ' + ipsec_vpn_real_count[0] + ' | Size: ' + ipsec_vpn_real_count[1])
 
     if ben_name:
-        ben_csv = domain_name + '_Iterate_' + ben_name + '.csv'
+        if os.path.exists(os.getcwd() + '\\OutputFiles'):
+            ben_csv = os.getcwd() + '\\OutputFiles\\' + domain_name + '_Iterate_' + ben_name + '.csv'
+        else:
+            os.makedirs(os.getcwd() + '\\OutputFiles')
+            ben_csv = os.getcwd() + '\\OutputFiles\\' + domain_name + '_Iterate_' + ben_name + '.csv'
     else:
-        ben_csv = domain_name + '_Bench_live_' + ben_id + '.csv'
+        if os.path.exists(os.getcwd() + '\\OutputFiles'):
+            ben_csv = os.getcwd() + '\\OutputFiles\\' + domain_name + '_Bench_live_' + ben_id + '.csv'
+        else:
+            os.makedirs(os.getcwd() + '\\OutputFiles')
+            ben_csv = os.getcwd() + '\\OutputFiles\\' + domain_name + '_Bench_live_' + ben_id + '.csv'
 
     title_list = ['Node count', 'MacDevice count', 'Interface count', 'Benchmark time',
                   'Retrieve live time', 'Full Datafolder size', 'Config count', 'Config size',
@@ -457,9 +469,9 @@ def benchmark_data(ben_id, sep_flag, ben_name):  # Benchmark数据统计
                   'IPv6L3 topo size', 'IPsec VPN Topo time', 'IPsec VPN Topo count',
                   'IPsec VPN Topo size', 'topology Logical Topology time',
                   'topology Logical Topology count', 'topology Logical Topology size',
-                  'Device Group count', 'Update Global Endpoint time', 'Update BGP MPLS cloud CE list time',
+                  'Device Group count', 'Update Global Endpoint time',
                   'Recalculate dynamic device group time', 'Recalculate site time',
-                  'Recalculate MPLS Could time', 'Build Default Dataview Time', 'Default Dataview Count',
+                  'Build Default Dataview Time', 'Default Dataview Count',
                   'Pre qualify DVT time', 'Build visual space instance time',
                   'Build network tree time', 'Build VP logical nodes time', 'Arp Table count',
                   'Arp Table size', 'CDP Table count', 'CDP Table size', 'Routing Table count',
@@ -482,8 +494,7 @@ def benchmark_data(ben_id, sep_flag, ben_name):  # Benchmark数据统计
                                 L2Topo_time, L2Topo_info[0], L2Topo_info[1], IPv6L3_time, IPv6L3_topo_info[0],
                                 IPv6L3_topo_info[1], ipsec_vpn_topo_time, vpn_topo_info[0], vpn_topo_info[1],
                                 topo_logical_time, topo_logical_info[0], topo_logical_info[0], devgp_count,
-                                update_endpoint_time, bgp_mpls_time, recal_dyna_devicegp, recal_site_time,
-                                recal_mpls_cloud,
+                                update_endpoint_time, recal_dyna_devicegp, recal_site_time,
                                 default_dataview, data_view_count, pre_qualify_dvt_time, visual_space_time,
                                 network_tree_time, vp_logical_time, arp_table_count[0], arp_table_count[1],
                                 cdp_table_count[0], cdp_table_count[1], route_count[0], route_count[1], mac_count[0],
@@ -494,7 +505,7 @@ def benchmark_data(ben_id, sep_flag, ben_name):  # Benchmark数据统计
                                 nat_real_table_count[1], ipsec_vpn_table_count[0], ipsec_vpn_table_count[1],
                                 ipsec_vpn_real_count[0], ipsec_vpn_real_count[1]])
         print('Generate Benchmark CSV File done.')
-        print('CSV File path:' + os.getcwd() + '\\' + ben_csv)
+        print('CSV File path:' + ben_csv)
     else:
         print('Will not Generate CSV file.')
 
@@ -509,12 +520,12 @@ def itera_benchmark(benchmk_name, sep_flag):
 
 if __name__ == '__main__':
     generate_csv = True  # 开启后在当前文件夹生成csv文件
-    domain_name = "Mic1"  # domain名称
+    domain_name = "NA45k_dm"  # domain名称
     benchmark_name = ""  # 如果配置Benchmark name将直接根据name遍历所有该name的Benchmark，task id配置将无效
-    task_id = "5e855de0-7f05-47b0-86d9-b43b4c2c72a5"  # task id 自动识别类型
+    task_id = "4f7b5400-79e0-420d-88cb-be5673245b89"  # task id 自动识别类型
     db_user = "admin"  # mongodb用户名
     db_password = "netbrain"  # mongodb密码
-    db_host = "10.10.7.192"  # mongodb IP
+    db_host = "10.10.5.248"  # mongodb IP
     db_port = "27017"  # mongodb端口
     is_ssl = False  # 是否配置SSL，默认false
     topo_min = 4  # 定义topo start time - topo table name的时间范围
@@ -581,8 +592,8 @@ if __name__ == '__main__':
                 print('Task status was not Succeeded, pass')
         else:
             print(">>>Can not find the ID you pointed.")
-    if is_sep[0]:
-        sep_connection.close()
-        connection.close()
-    else:
+    # if is_sep[0]:
+    #     sep_connection.close()
+    #     connection.close()
+    # else:
         connection.close()

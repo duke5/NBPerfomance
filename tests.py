@@ -1,28 +1,31 @@
 # -*- coding: utf-8 -*-
-
-
-def list_avg(lst1, lst2, lst3):
-    lst_tmp = []
-    if len(lst1) == len(lst2) and len(lst2) == len(lst3):
-        for t in range(len(lst1)):
-            # print(t)
-            # tp = round((float(lst1[t]) + float(lst2[t]) + float(lst3[t]))/3, 3)
-            # print(tp)
-            # lst_tmp.append(str(tp))
-            lst_tmp.insert(t, str(round((float(lst1[t]) + float(lst2[t]) + float(lst3[t]))/3, 3)))
-    return lst_tmp
+from pymongo import MongoClient
 
 
 if __name__ == '__main__':
-    lst1 = [[1.23, 2.34, 3.45], [4.26, 6.24, 4.25], [5.25, 1.54, 9.75]]
-    print(list_avg(lst1[0], lst1[1], lst1[2]))
-    lst2 = [[1.23, 2.34, 3.45], [4.26, 6.24, 4.25], [5.25, 1.54, 9.75], []]
-    lst3 = [1, 2]
-    lst4 = [3, 4, 5]
-    lst3.extend(lst4)
-    print(lst3)
-    for i in lst2:
-        if len(i) != 0:
-            print(i[0])
+    generate_csv = False  # 开启后在当前文件夹生成csv文件
+    domain_name = "NA45K"  # domain名称
+    tenant_name = "Initial_Tenant"
+    # benchmark_name = ""  # 如果配置Benchmark name将直接根据name遍历所有该name的Benchmark，task id配置将无效
+    # task_id = "19a6c5e8-d3dc-4ba4-9f16-2c75398c7900"  # task id 自动识别类型
+    db_user = "admin"  # mongodb用户名
+    db_password = "Netbrain123"  # mongodb密码
+    db_host = "192.168.31.197"  # mongodb IP
+    db_port = "27017"  # mongodb端口
+    is_ssl = False  # 是否配置SSL，默认false
 
-    lsts = ['abc', ['1', '2']]
+    if is_ssl:
+        connection = MongoClient("mongodb://" + db_user + ":" + db_password + "@" + db_host + ":" + db_port +
+                                 "/admin?authMechanism=SCRAM-SHA-256&ssl=true&ssl_cert_reqs=CERT_NONE")
+    else:
+        connection = MongoClient("mongodb://" + db_user + ":" + db_password + "@" + db_host + ":" + db_port +
+                                 "/admin?authMechanism=SCRAM-SHA-256")
+    tensys = connection.get_database(tenant_name)
+
+    rbtf_lst = []
+    rbttreefolders = tensys.RunbookTree.find({"nodeType": 0, "name": {"$regex": "ptest"}})
+    for tmp1 in rbttreefolders:
+        rbtft1 = tmp1.get("_id")
+        if rbtft1:
+            rbtf_lst.append(rbtft1)
+    print()

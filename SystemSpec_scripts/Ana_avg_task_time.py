@@ -5,24 +5,22 @@ from pymongo import MongoClient
 
 if __name__ == '__main__':
     generate_csv = False  # 开启后在当前文件夹生成csv文件
-    domain_name = "NA45k_dm"  # domain名称
+    domain_name = "NA45K"  # domain名称
     # benchmark_name = ""  # 如果配置Benchmark name将直接根据name遍历所有该name的Benchmark，task id配置将无效
     # task_id = "19a6c5e8-d3dc-4ba4-9f16-2c75398c7900"  # task id 自动识别类型
     db_user = "admin"  # mongodb用户名
-    db_password = "netbrain"  # mongodb密码
+    db_password = "Netbrain123"  # mongodb密码
     db_host = "192.168.31.197"  # mongodb IP
     db_port = "27017"  # mongodb端口
     is_ssl = False  # 是否配置SSL，默认false
 
-    starttime = datetime.datetime(2021, 6, 9, 6, 42, 0)
-    endtime = datetime.datetime(2021, 6, 9, 7, 44, 0)
+    starttime = datetime.datetime(2021, 7, 9, 2, 56, 0)
+    endtime = datetime.datetime(2021, 7, 9, 3, 2, 0)
 
     task_type_lst5 = ['ExeCliCmdMiniTask']
-    task_type_lst10 = ['RunCompareTask', 'RetrieveLiveDataMiniTask', 'ExeCliCmdMiniTask', 'RunMultiNIAnalysisTask',
-                       'RunNICreateDTGTask']
+    task_type_lst10 = ['RunCompareTask', 'RetrieveLiveDataMiniTask', 'ExeCliCmdMiniTask', 'RunMultiNIAnalysisTask']
     task_type_lst20 = ['RunCompareTask', 'RunPingMiniTask', 'RunTraceRouteMiniTask', 'RetrieveLiveDataMiniTask',
-                       'ExeCliCmdMiniTask', 'QappHistoricalDataAnalysisTask', 'RunNICreateDTGTask',
-                       'RunMultiNIAnalysisTask']
+                       'ExeCliCmdMiniTask', 'QappHistoricalDataAnalysisTask', 'RunMultiNIAnalysisTask']
 
     if is_ssl:
         connection = MongoClient("mongodb://" + db_user + ":" + db_password + "@" + db_host + ":" + db_port +
@@ -35,6 +33,7 @@ if __name__ == '__main__':
 
     path_tasks = domsys.P2pPath.find({'startTime': {'$gt': starttime, '$lt': endtime}})
     pt_lst = list(path_tasks)
+    # print(pt_lst)
     pt_sum = 0.00
     success_count = 0
     for pt in pt_lst:
@@ -44,9 +43,11 @@ if __name__ == '__main__':
         p_status = m.group(1)
         if p_status == 'Success':
             p_time = float(m.group(2))
+            # print('path time is: ' + p_time)
             pt_sum += p_time
             success_count += 1
     if success_count != 0:
+        # print('success count is: ' + success_count)
         pt_avg_time = round(pt_sum / success_count, 3)
     else:
         pt_avg_time = 0.000
