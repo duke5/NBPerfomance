@@ -1,31 +1,6 @@
-# -*- coding: utf-8 -*-
-from pymongo import MongoClient
+import re
 
-
-if __name__ == '__main__':
-    generate_csv = False  # 开启后在当前文件夹生成csv文件
-    domain_name = "NA45K"  # domain名称
-    tenant_name = "Initial_Tenant"
-    # benchmark_name = ""  # 如果配置Benchmark name将直接根据name遍历所有该name的Benchmark，task id配置将无效
-    # task_id = "19a6c5e8-d3dc-4ba4-9f16-2c75398c7900"  # task id 自动识别类型
-    db_user = "admin"  # mongodb用户名
-    db_password = "Netbrain123"  # mongodb密码
-    db_host = "192.168.31.197"  # mongodb IP
-    db_port = "27017"  # mongodb端口
-    is_ssl = False  # 是否配置SSL，默认false
-
-    if is_ssl:
-        connection = MongoClient("mongodb://" + db_user + ":" + db_password + "@" + db_host + ":" + db_port +
-                                 "/admin?authMechanism=SCRAM-SHA-256&ssl=true&ssl_cert_reqs=CERT_NONE")
-    else:
-        connection = MongoClient("mongodb://" + db_user + ":" + db_password + "@" + db_host + ":" + db_port +
-                                 "/admin?authMechanism=SCRAM-SHA-256")
-    tensys = connection.get_database(tenant_name)
-
-    rbtf_lst = []
-    rbttreefolders = tensys.RunbookTree.find({"nodeType": 0, "name": {"$regex": "ptest"}})
-    for tmp1 in rbttreefolders:
-        rbtft1 = tmp1.get("_id")
-        if rbtft1:
-            rbtf_lst.append(rbtft1)
-    print()
+dis_result = "Discovered 44992 IP address(es), found 44991 device(s). Detail info: Alcatel Lucent Service Router(111) Arista Switch(29) Arris Router(363) Cache Engine(1) Call Manager(11) Checkpoint Firewall(1) Cisco ACE(132) Cisco ASA Firewall(412) Cisco Catalyst Switch(18) Cisco IOS Switch(25254) Cisco IOS XR(870) Cisco Nexus Switch(673) Cisco Router(8530) Cisco WAP(6844) Cisco WLC(151) End System(730) Extreme Switch(70) F5 Load Balancer(15) HP ProCurve Switch(83) HP Virtual Connect(14) Juniper EX Switch(238) Juniper Router(98) Juniper SRX Firewall(161) Netscaler Load Balancer(8) Printer(2) Riverbed WAN Optimizer(86) Ubuntu Server(3) Unclassified Device(67) Unclassified Switch(10) Windows Server(6) \r\n"
+parten1 = "Discovered (\d+) IP address\(es\)"
+pipei = re.findall(parten1, dis_result)
+print(pipei[0])
